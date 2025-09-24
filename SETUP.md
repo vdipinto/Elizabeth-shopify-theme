@@ -112,12 +112,15 @@ npx husky install
 **.husky/pre-commit**
 ```sh
 #!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
 npx lint-staged
 ```
 
 **.husky/pre-push**
 ```sh
 #!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
 echo "⚡ Building Tailwind for production before push..."
 
@@ -194,14 +197,50 @@ logs
 assets/application.css
 ```
 
-## 10. Shopify Theme Integration
+## 10. Shopify Ignore
+
+**.shopifyignore**
+```
+# Node / build
+node_modules/
+src/
+dist/
+build/
+.cache/
+
+# Tooling configs
+.gitignore
+.husky/
+postcss.config.js
+tailwind.config.js
+eslint.config.*
+.prettier*
+
+# Docs
+*.md
+
+# Env
+*.env
+.env.local
+.env.*.local
+.shopifyignore
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+```
+
+## 11. Shopify Theme Integration
 
 **layout/theme.liquid**
 ```liquid
 {{ 'application.css' | asset_url | stylesheet_tag }}
 ```
 
-## 11. Development Workflow
+## 12. Development Workflow
 
 - Terminal A:
   ```bash

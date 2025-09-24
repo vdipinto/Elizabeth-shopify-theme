@@ -1,0 +1,22 @@
+# Node / build artifacts
+node_modules/*
+src/*
+dist/*
+build/*
+.cache/*
+
+# Config & tooling
+.husky/*
+.gitignore
+postcss.config.js
+tailwind.config.js
+eslint.config.*
+prettier.config.*
+.prettierignore
+*.md
+
+# Local environment
+*.env
+.env.local
+.env.*.local
+.shopifyignore
