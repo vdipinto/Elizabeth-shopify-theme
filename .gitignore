@@ -1,0 +1,37 @@
+# Node (only if you're using npm for linting, prettier, husky, etc.)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp
+.pnp.js
+
+# Logs
+logs
+*.log
+
+# Shopify CLI / Theme Kit
+.shopify-cli.yml
+
+# Environment variables
+.env
+.env.*
+!.env.example  # keep a reference template
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VSCode (ignore personal configs but allow workspace settings if needed)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

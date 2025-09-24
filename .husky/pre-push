@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "⚡ Building Tailwind for production before push..."
+
+# Run Tailwind build, exit if it fails
+if ! npm run build:css; then
+  echo "❌ Tailwind build failed. Push aborted."
+  exit 1
+fi
+
+# Stage the newly built CSS so it’s always up to date in the push
+git add assets/application.css
+
+echo "✅ Tailwind build complete. application.css staged for push."
