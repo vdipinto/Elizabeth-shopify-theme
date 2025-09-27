@@ -1,5 +1,11 @@
-<div class="homepage bg-red-500 text-white p-6">
+{% comment %} <div class="homepage bg-red-500 text-white p-6">
   <img src="{{ 'weeklyhow-logo.png' | asset_img_url: 'large' }}" class="logo">
   <h1 class="text-3xl font-bold">Welcome to Shopify Theme Development course!</h1>
   <p>{% render 'homepage-text' %}</p>
+</div> {% endcomment %}
+<div x-data="{ open: false }" class="p-4 border">
+  <button type="button" @click.stop="open = !open" class="border px-3 py-1">
+    Toggle
+  </button>
+  <p x-show="open" x-cloak>It works 🎉</p>
 </div>
