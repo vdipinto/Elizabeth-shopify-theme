@@ -1,0 +1,9 @@
+:root {
+    --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --font-heading: 'Zalando Sans SemiExpanded', sans-serif;
+  }
+  
+  html, body {
+    font-family: var(--font-body);
+  }
+  
