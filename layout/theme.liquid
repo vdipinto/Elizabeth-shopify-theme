@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en" class="">
   <head>
     <title>{{ page_title }}</title>
     <meta charset="utf-8">
@@ -7,12 +7,36 @@
     <meta name="description" content="{{ page_description | escape }}">
     <link rel="canonical" href="{{ canonical_url }}">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+
     {{ content_for_header }}
-    <!-- Header hook for plugins -->
+
+    <!-- Prevent dropdown flash before Alpine mounts -->
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zalando+Sans+SemiExpanded:wght@400;600;700&family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    >
+
+    <!-- Tailwind output -->
     {{ 'application.css' | asset_url | stylesheet_tag }}
-    {{ 'application.js' | asset_url | script_tag }}
+
+    <!-- Custom font overrides -->
+    {{ 'fonts.css' | asset_url | stylesheet_tag }}  
+
+    <!-- Alpine.js (local copy, served by Shopify CDN) -->
+    <script src="{{ 'alpine.min.js' | asset_url }}" defer></script>
+
+    <!-- Your theme JS -->
+    <script src="{{ 'application.js' | asset_url }}" defer></script>
   </head>
   <body>
+    {% section 'header' %}
     <main role="main">
       {{ content_for_layout }}
     </main>
