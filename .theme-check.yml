@@ -1,0 +1,4 @@
+# temporarily remove the preset to stop the crash
+ignore:
+  - node_modules/**
+  - dist/**
