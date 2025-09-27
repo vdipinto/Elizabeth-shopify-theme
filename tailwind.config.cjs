@@ -7,6 +7,12 @@ module.exports = {
     "./templates/**/*.{liquid,json}",
     "./assets/**/*.liquid"
   ],
-  theme: { extend: {} },
+  theme: { extend: {
+   
+    fontFamily: {
+      heading: ["'Zalando Sans SemiExpanded'", "sans-serif"],
+      body: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Arial", "sans-serif"],
+    },
+  } },
   plugins: [],
 };
