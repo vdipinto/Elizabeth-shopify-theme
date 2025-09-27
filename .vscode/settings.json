@@ -1,0 +1,13 @@
+{
+  "files.associations": { "*.liquid": "liquid" },
+
+  "emmet.includeLanguages": { "liquid": "html" },
+
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "emmet.triggerExpansionOnTab": true
+}
