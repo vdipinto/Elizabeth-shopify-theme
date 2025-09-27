@@ -1,0 +1,167 @@
+{% assign header_link_list = section.settings.header_link_list %}
+{% assign header_menu = linklists[header_link_list] %}
+
+<header class="border-b bg-white" x-data="{ mobileMenuOpen: false }">
+  <div class="mx-auto max-w-container px-4">
+    {%- comment -%} MOBILE BAR (hamburger + title | Search + Cart) {%- endcomment -%}
+    <div class="flex h-[60px] items-center justify-between md:hidden">
+      <!-- Left group: Hamburger + Store name -->
+      <div class="flex items-center gap-3 min-w-0">
+        <button
+          type="button"
+          aria-label="Menu"
+          class="w-10 h-10 inline-flex items-center justify-center"
+          @click="mobileMenuOpen = true"
+        >
+          {% render 'icon-menu', class: 'w-6 h-6 text-black' %}
+        </button>
+        <a
+          href="{{ routes.root_url }}"
+          class="block truncate text-lg font-extralight uppercase tracking-wide text-black"
+        >
+          {{ section.settings.mobile_menu_title }}
+        </a>
+      </div>
+
+      <!-- Right group: Search + Cart -->
+      <div class="flex items-center gap-6">
+        <a href="{{ routes.search_url | default: '/search' }}" class="text-base tracking-wide text-black">Search</a>
+        <a href="{{ routes.cart_url }}" class="text-base tracking-wide text-black" aria-label="Cart">
+          Cart ({{ cart.item_count }})
+        </a>
+      </div>
+    </div>
+
+    {%- comment -%} DESKTOP BAR (equal spacing with dropdowns) {%- endcomment -%}
+    <nav class="hidden md:flex h-[60px] items-center">
+      <ul class="flex w-full items-center justify-between">
+        <!-- 1) Logo -->
+        <li class="min-w-0">
+          <a
+            href="{{ routes.root_url }}"
+            class="block truncate text-xl font-extralight uppercase tracking-wide text-black"
+          >
+            {{ section.settings.mobile_menu_title }}
+          </a>
+        </li>
+
+        <!-- 2) Primary menu -->
+        {% for link in header_menu.links %}
+          <li>
+            {% if link.links != blank %}
+              <div class="relative group">
+                <button class="flex items-center text-sm tracking-wide text-black hover:text-gray-700">
+                  {{ link.title }}
+                  {% render 'icon-dropdown',
+                    class: 'ml-1 w-3.5 h-3.5 text-black group-hover:text-gray-700',
+                    title: ''
+                  %}
+                </button>
+                <div
+                  class="
+                    invisible opacity-0 group-hover:visible group-hover:opacity-100 transition
+                    absolute left-0 mt-2 min-w-[12rem] bg-white border shadow-lg rounded-md p-2
+                  "
+                >
+                  {% for child in link.links %}
+                    <a
+                      href="{{ child.url }}"
+                      class="block px-3 py-2 text-sm tracking-wide text-black hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      {{ child.title }}
+                    </a>
+                  {% endfor %}
+                </div>
+              </div>
+            {% else %}
+              <a href="{{ link.url }}" class="text-sm tracking-wide text-black hover:text-gray-700">
+                {{ link.title }}
+              </a>
+            {% endif %}
+          </li>
+        {% endfor %}
+
+        <!-- 3) Search -->
+        <li>
+          <a
+            href="{{ routes.search_url | default: '/search' }}"
+            class="text-sm tracking-wide text-black hover:text-gray-700"
+            >Search</a
+          >
+        </li>
+
+        <!-- 4) Log in -->
+        {%- comment -%} 4) Account/Login {%- endcomment -%}
+        {% if shop.customer_accounts_enabled %}
+          {% if customer %}
+            <!-- Logged in -->
+            <li>
+              <a
+                href="{{ routes.account_url }}"
+                class="text-sm tracking-wide text-black hover:text-gray-700"
+                aria-label="My account"
+              >
+                {{ customer.first_name | default: 'My Account' }}
+              </a>
+            </li>
+            <li>
+              <a
+                href="{{ routes.account_logout_url }}"
+                class="text-sm tracking-wide text-black hover:text-gray-700"
+              >
+                Log out
+              </a>
+            </li>
+          {% else %}
+            <!-- Not logged in -->
+            <li>
+              <a
+                href="{{ routes.account_login_url }}"
+                class="text-sm tracking-wide text-black hover:text-gray-700"
+              >
+                Log in
+              </a>
+            </li>
+          {% endif %}
+        {% endif %}
+
+        <!-- 5) Cart -->
+        <li>
+          <a
+            href="{{ routes.cart_url }}"
+            class="inline-flex items-center tracking-wide text-black hover:text-gray-700"
+            aria-label="Cart"
+          >
+            {% render 'icon', name: 'shopping-bag', class: 'w-5 h-5 text-black', title: 'Cart' %}
+            <span class="ml-1 text-sm">({{ cart.item_count }})</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ✅ Render the mobile panel OUTSIDE the flex row, but inside the same x-data scope -->
+  {% render 'mobile-menu', links: header_menu.links, title: section.settings.mobile_menu_title %}
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "mobile_menu_title",
+      "label": "Mobile Menu Title",
+      "default": "Menu",
+      "info": "This is the title of the mobile menu"
+    },
+    {
+      "type": "link_list",
+      "id": "header_link_list",
+      "label": "Header Link List",
+      "info": "This is the link list of the header menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}
