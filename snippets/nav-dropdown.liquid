@@ -1,0 +1,39 @@
+<div x-data="{ open: false }" class="relative">
+  <button
+    @click="open = !open"
+    @click.away="open = false"
+    @keydown.escape.window="open = false"
+    type="button"
+    class="inline-flex items-center text-base text-gray-500 hover:text-gray-900"
+  >
+    {{ link.title }}
+    {% render 'icon', name: 'dropdown', class: 'w-4 h-4 ml-1' %}
+  </button>
+
+  <!-- Dropdown panel -->
+  <div
+    x-show="open"
+    x-cloak
+    class="absolute z-10 mt-5 left-0 px-2 sm:px-0 min-w-[16rem] max-w-md"
+  >
+    <div class="shadow-lg border ring-black ring-opacity-5 overflow-hidden rounded-lg">
+      <div class="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
+        {% for childlink in link.links %}
+          <a
+            href="{{ childlink.url }}"
+            class="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-100"
+          >
+            <!-- icon for the child link -->
+            <div class="flex-shrink-0 text-gray-400">
+              {% render 'icon', name: 'shopping-bag', class: 'w-5 h-5' %}
+            </div>
+
+            <div class="ml-4">
+              <p class="text-gray-900 text-base font-medium">{{ childlink.title }}</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
