@@ -1,0 +1,136 @@
+{%- comment -%}
+  Mobile menu panel (dropdown-style with + expanders)
+  Requirements:
+  - Uses AlpineJS boolean: mobileMenuOpen
+  - All text black, tracking-wide
+  - Shows primary menu; parents with children get a "+" expander
+  - Includes Search and Cart links at the top bar (outside), so here we only render the panel
+  - “Register” intentionally omitted (per spec)
+{%- endcomment -%}
+
+
+{%- comment -%} Accept params passed from the section {%- endcomment -%}
+{%- assign menu_links = links | default: linklists['primary-menu'].links -%}
+{%- assign mobile_title = title | default: shop.name -%}
+
+<style>
+  [x-cloak] { display: none !important; }
+</style>
+
+<!-- Overlay -->
+<div
+  x-cloak
+  x-show="mobileMenuOpen"
+  x-transition.opacity
+  class="fixed inset-0 z-50 bg-black/30 md:hidden"
+  @click.self="mobileMenuOpen = false"
+  aria-hidden="true"
+></div>
+
+<!-- Panel -->
+<aside
+  x-cloak
+  x-show="mobileMenuOpen"
+  x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="-translate-x-full opacity-0"
+  x-transition:enter-end="translate-x-0 opacity-100"
+  x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="translate-x-0 opacity-100"
+  x-transition:leave-end="-translate-x-full opacity-0"
+  class="fixed left-0 top-0 z-50 h-full w-[85%] max-w-[360px] bg-white border-r md:hidden"
+  role="dialog"
+  aria-modal="true"
+>
+  <!-- Top strip with Close + Title -->
+  <div class="h-[60px] flex items-center border-b px-4">
+    <button
+      type="button"
+      class="w-10 h-10 inline-flex items-center justify-center text-black"
+      aria-label="Close menu"
+      @click="mobileMenuOpen = false"
+    >
+      <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+    <span class="ml-2 text-base font-extralight uppercase tracking-wide text-black">{{ mobile_title }}</span>
+  </div>
+
+  <!-- Menu list -->
+  <nav class="px-4 py-3">
+    <ul class="space-y-1">
+      {% for link in menu_links %}
+        <li class="border-b last:border-b-0">
+          {% if link.links != blank %}
+            <!-- Parent with children: title + plus expander -->
+            <div x-data="{ open: false }" class="py-3">
+              <button
+                type="button"
+                class="w-full flex items-center justify-between text-left text-lg tracking-wide text-black"
+                @click="open = !open"
+                :aria-expanded="open.toString()"
+                aria-controls="m-sub-{{ forloop.index }}"
+              >
+                <span>{{ link.title }}</span>
+                <span class="shrink-0">
+                  <template x-if="!open">
+                    {% render 'icon-plus', class: 'w-5 h-5 text-black' %}
+                  </template>
+                  <template x-if="open">
+                    {% render 'icon-minus', class: 'w-5 h-5 text-black' %}
+                  </template>
+                </span>
+              </button>
+
+              <div
+                id="m-sub-{{ forloop.index }}"
+                x-show="open"
+                x-transition
+                class="mt-2 pl-3 pb-2 space-y-2"
+              >
+                {% for child in link.links %}
+                  <a href="{{ child.url }}" class="block py-1.5 text-base tracking-wide text-black">
+                    {{ child.title }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <!-- Single link -->
+            <a href="{{ link.url }}" class="block py-3 text-lg tracking-wide text-black">
+              {{ link.title }}
+            </a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <!-- Actions -->
+  {% if shop.customer_accounts_enabled %}
+    <div class="mt-auto px-4 pb-6">
+      {% if customer %}
+        <a
+          href="{{ routes.account_url }}"
+          class="block w-full text-center text-base tracking-wide text-white bg-black py-3"
+        >
+          Hi, {{ customer.first_name }}
+        </a>
+  
+        <a
+          href="{{ routes.account_logout_url }}"
+          class="block w-full text-center text-base tracking-wide text-black border border-black py-3 mt-2"
+        >
+          Log out
+        </a>
+      {% else %}
+        <a
+          href="{{ routes.account_login_url }}"
+          class="block w-full text-center text-base tracking-wide text-white bg-black py-3"
+        >
+          Log in
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</aside>
