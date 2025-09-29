@@ -1,0 +1,35 @@
+{% schema %}
+{
+  "name": "Custom 404",
+  "tag": "section",
+  "class": "border-t border-b border-black",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Page Not Found" },
+    { "type": "richtext", "id": "message", "label": "Message", "default": "<p>It looks like the page you’re looking for doesn’t exist. Don’t worry, we’ve got plenty of other great things for you to explore. Check out our best sellers or get back to homepage.</p>" },
+    { "type": "url", "id": "button_link", "label": "Button link", "default": "/" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Back to Homepage" }
+  ]
+}
+{% endschema %}
+
+<div class="mx-auto w-full max-w-6xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+  <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-black">
+    {{ section.settings.heading }}
+  </h1>
+
+  <div class="mt-3 max-w-2xl text-sm md:text-base text-black/80 prose prose-p:my-0">
+    {{ section.settings.message }}
+  </div>
+
+  <div class="mt-5">
+    <a
+        href="{{ section.settings.button_link | default: routes.root_url }}"
+        class="group inline-flex items-center justify-center gap-2 bg-black px-8 py-4 text-lg font-medium text-white hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition"
+      >
+        {{ section.settings.button_label }}
+        <span class="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1">
+          {% render 'icon', name: 'arrow-up-right', class: 'w-5 h-5', title: section.settings.button_label %}
+        </span>
+      </a>     
+  </div>
+</div>
