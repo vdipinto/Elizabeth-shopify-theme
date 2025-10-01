@@ -4,5 +4,20 @@
       "title": "Not found",
       "subtext_html": "The page you were looking for does not exist"
     }
+  },
+  "sections": {
+    "cart": {
+      "title": "Your Cart",
+      "empty": "Your cart is currently empty.",
+      "continue_shopping": "Continue Shopping",
+      "update": "Update Cart",
+      "checkout": "Checkout",
+      "subtotal": "Subtotal",
+      "total": "Total",
+      "remove": "Remove",
+      "aria_dec": "Decrease quantity",
+      "aria_inc": "Increase quantity",
+      "aria_remove": "Remove item"
+    }
   }
 }
