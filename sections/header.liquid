@@ -2,7 +2,7 @@
 {% assign header_menu = linklists[header_link_list] %}
 
 <header class="border-b bg-white" x-data="{ mobileMenuOpen: false }">
-  <div class="mx-auto max-w-container px-4">
+  <div class="mx-auto px-4">
     {%- comment -%} MOBILE BAR (hamburger + title | Search + Cart) {%- endcomment -%}
     <div class="flex h-[60px] items-center justify-between md:hidden">
       <!-- Left group: Hamburger + Store name -->
@@ -26,9 +26,16 @@
       <!-- Right group: Search + Cart -->
       <div class="flex items-center gap-6">
         <a href="{{ routes.search_url | default: '/search' }}" class="text-base tracking-wide text-black">Search</a>
-        <a href="{{ routes.cart_url }}" class="text-base tracking-wide text-black" aria-label="Cart">
-          Cart ({{ cart.item_count }})
-        </a>
+        <button
+          type="button"
+          class="text-base tracking-wide text-black"
+          aria-label="Open cart drawer"
+          @click.prevent.stop="console.log('Mobile cart button clicked'); $dispatch('cart:open')"
+          x-data="{ count: {{ cart.item_count }} }"
+          @cart:count.window="count = $event.detail"
+        >
+          Cart (<span x-text="count">{{ cart.item_count }}</span>)
+        </button>
       </div>
     </div>
 
@@ -127,14 +134,17 @@
 
         <!-- 5) Cart -->
         <li>
-          <a
-            href="{{ routes.cart_url }}"
+          <button
+            type="button"
             class="inline-flex items-center tracking-wide text-black hover:text-gray-700"
-            aria-label="Cart"
+            aria-label="Open cart drawer"
+            @click.prevent.stop="console.log('Desktop cart button clicked'); $dispatch('cart:open')"
+            x-data="{ count: {{ cart.item_count }} }"
+            @cart:count.window="count = $event.detail"
           >
             {% render 'icon', name: 'shopping-bag', class: 'w-5 h-5 text-black', title: 'Cart' %}
-            <span class="ml-1 text-sm">({{ cart.item_count }})</span>
-          </a>
+            <span class="ml-1 text-sm" x-text="`(${count})`"></span>
+          </button>
         </li>
       </ul>
     </nav>
