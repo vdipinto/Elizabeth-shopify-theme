@@ -1,0 +1,287 @@
+{% schema %}
+{
+  "name": "Cart template",
+  "tag": "section",
+  "class": "py-8 border-y border-black",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "continue_shopping",
+      "name": "Continue shopping",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link label",
+          "default": "Continue Shopping"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL",
+          "info": "Leave blank to use All products collection URL"
+        }
+      ]
+    },
+    {
+      "type": "subtotal",
+      "name": "Subtotal",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Subtotal label",
+          "default": "Subtotal"
+        }
+      ]
+    },
+    {
+      "type": "update_button",
+      "name": "Update button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button label",
+          "default": "Update Cart"
+        }
+      ]
+    },
+    {
+      "type": "checkout_button",
+      "name": "Checkout button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button label",
+          "default": "Checkout"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart template",
+      "blocks": [
+        { "type": "continue_shopping" },
+        { "type": "subtotal" },
+        { "type": "update_button" },
+        { "type": "checkout_button" }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<div
+  class="page-width mx-auto"
+  data-cart-root
+  data-locale="{{ request.locale.iso_code | replace: '_','-' }}"
+  data-currency="{{ cart.currency.iso_code }}"
+>
+  <!-- Heading with padding -->
+  <h1 class="text-3xl font-bold mb-6 px-4">{{ 'sections.cart.title' | t }}</h1>
+
+  {% if cart.item_count == 0 %}
+    <div class="px-4">
+      <p class="text-gray-600 mb-4">{{ 'sections.cart.empty' | t }}</p>
+      <a
+        href="{{ routes.all_products_collection_url }}"
+        class="inline-flex items-center justify-center px-6 py-3 bg-black text-white hover:bg-black/80 transition"
+      >
+        {{ 'sections.cart.continue_shopping' | t }}
+      </a>
+    </div>
+  {% else %}
+    <form action="{{ routes.cart_url }}" method="post" novalidate>
+      <!-- Table full-bleed borders, padded content -->
+      <div class="-mx-4">
+        <div class="px-4">
+          <table class="w-full text-left border-t border-b border-black border-separate border-spacing-0">
+            <tbody>
+              {% for item in cart.items %}
+                {%- assign line = forloop.index -%}
+                {%- assign minus_qty = item.quantity | minus: 1 -%}
+                {%- if minus_qty < 0 -%}{% assign minus_qty = 0 %}{% endif %}
+
+                <tr
+                  class="border-b border-black"
+                  data-line-key="{{ item.key }}"
+                  data-line-index="{{ line }}"
+                >
+                  <!-- Image -->
+                  <td class="align-top p-4 w-[160px] sm:w-[200px] border-r border-black">
+                    <a href="{{ item.url }}" class="block">
+                      <img
+                        src="{{ item.image | image_url: width: 360 }}"
+                        alt="{{ item.product.title | escape }}"
+                        width="180"
+                        height="180"
+                        class="w-[140px] h-[100px] sm:w-[180px] sm:h-[120px] object-cover"
+                      >
+                    </a>
+                  </td>
+
+                  <!-- Details + qty + price/remove -->
+                  <td class="align-top p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <a
+                          href="{{ item.url }}"
+                          class="block text-lg sm:text-xl font-semibold leading-tight hover:underline"
+                        >
+                          {{ item.product.title }}
+                        </a>
+
+                        {%- comment -%} Variant/options (works even when variant_title is null) {%- endcomment -%}
+                        {% if item.options_with_values and item.options_with_values.size > 0 %}
+                          <div class="mt-2 space-y-1 text-sm">
+                            {% for opt in item.options_with_values %}
+                              <div class="flex items-center gap-2">
+                                {% assign opt_name_lc = opt.name | downcase %}
+                                {% if opt_name_lc contains 'color' or opt_name_lc contains 'colour' %}
+                                  <span class="inline-block w-4 h-4 rounded-sm border" style="background: {{ opt.value | escape }};" aria-hidden="true"></span>
+                                {% endif %}
+                                <span class="text-gray-700">
+                                  <span class="sr-only">{{ opt.name }}: </span>{{ opt.value }}
+                                </span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+
+                        <!-- Qty controls -->
+                        <div class="mt-4 flex items-center gap-4 text-base">
+                          <a
+                            href="/cart/change?line={{ line }}&quantity={{ minus_qty }}"
+                            class="w-8 h-8 border rounded-full flex items-center justify-center"
+                            aria-label="{{ 'sections.cart.aria_dec' | t }}"
+                            data-ajax="cart-change"
+                            data-role="dec"
+                            data-key="{{ item.key }}"
+                            data-qty="{{ minus_qty }}"
+                          >
+                            {% render 'icon-minus' %}
+                          </a>
+
+                          <input
+                            id="qty-{{ item.key }}"
+                            type="number"
+                            name="updates[]"
+                            value="{{ item.quantity }}"
+                            min="0"
+                            class="w-10 text-center"
+                          >
+
+                          <a
+                            href="/cart/change?line={{ line }}&quantity={{ item.quantity | plus: 1 }}"
+                            class="w-8 h-8 border rounded-full flex items-center justify-center"
+                            aria-label="{{ 'sections.cart.aria_inc' | t }}"
+                            data-ajax="cart-change"
+                            data-role="inc"
+                            data-key="{{ item.key }}"
+                            data-qty="{{ item.quantity | plus: 1 }}"
+                          >
+                            {% render 'icon-plus' %}
+                          </a>
+                        </div>
+                      </div>
+
+                      <!-- Price + remove -->
+                      <div class="text-right min-w-[140px] flex flex-col items-end">
+                        <div class="text-xl font-semibold">
+                          <span data-unit-price="{{ item.key }}">{{ item.final_price | money }}</span>
+                        </div>
+
+                        {%- if item.variant.compare_at_price and item.variant.compare_at_price > item.final_price -%}
+                          <div class="text-gray-400 line-through text-base">
+                            {{ item.variant.compare_at_price | money }}
+                          </div>
+                        {%- endif -%}
+
+                        <a
+                          href="/cart/change?line={{ line }}&quantity=0"
+                          aria-label="{{ 'sections.cart.aria_remove' | t }}"
+                          class="mt-2 inline-flex items-center gap-1 text-sm text-black hover:text-black"
+                          data-ajax="cart-change"
+                          data-key="{{ item.key }}"
+                          data-qty="0"
+                        >
+                          {% render 'icon', name: 'trash', class: 'w-6 h-6' %}
+                          <span class="sr-only">{{ 'sections.cart.remove' | t }}</span>
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mx-1 border-black">
+        <div class="px-4 py-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+
+          {%- comment -%} LEFT column: continue shopping (if block present) {%- endcomment -%}
+          <div class="w-full sm:w-auto">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'continue_shopping' %}
+                  {%- assign cs_url = block.settings.url | default: routes.all_products_collection_url -%}
+                  <a
+                    {{ block.shopify_attributes }}
+                    href="{{ cs_url }}"
+                    class="text-sm hover:underline"
+                  >
+                    {{ block.settings.label }}
+                  </a>
+              {% endcase %}
+            {% endfor %}
+          </div>
+
+          {%- comment -%} RIGHT column: subtotal + buttons (in block order) {%- endcomment -%}
+          <div class="text-right w-full sm:w-auto">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'subtotal' %}
+                  <p {{ block.shopify_attributes }} class="text-xl font-bold">
+                    {{ block.settings.label }}: <span data-subtotal>{{ cart.total_price | money }}</span>
+                  </p>
+
+                {% when 'update_button' %}
+                  <div {{ block.shopify_attributes }} class="mt-3">
+                    <button
+                      type="submit"
+                      name="update"
+                      class="px-6 py-3 border border-black w-full sm:w-44 transition"
+                    >
+                      {{ block.settings.label }}
+                    </button>
+                  </div>
+
+                {% when 'checkout_button' %}
+                  <div {{ block.shopify_attributes }} class="mt-3">
+                    <button
+                      type="submit"
+                      name="checkout"
+                      class="px-6 py-3 bg-black text-white hover:bg-black/80 w-full sm:w-44 transition"
+                    >
+                      {{ block.settings.label }}
+                    </button>
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+    </form>
+  {% endif %}
+</div>
