@@ -1,0 +1,159 @@
+{% schema %}
+{
+  "name": "Cart drawer",
+  "tag": "section",
+  "class": "contents",
+  "settings": []
+}
+{% endschema %}
+
+<div
+  id="cart-drawer-root"
+  x-data="window.cartDrawer({
+    locale: '{{ request.locale.iso_code | replace: '_','-' }}',
+    currency: '{{ cart.currency.iso_code }}'
+  })"
+  @cart:open.window="open()"
+  @cart:add.window="add($event.detail)"
+>
+  <!-- Overlay -->
+  <div x-cloak x-show="opened" @click="close()" class="fixed inset-0 bg-black/30 z-50"></div>
+
+  <!-- Drawer -->
+  <aside
+    x-cloak
+    x-show="opened"
+    @keydown.escape.window="close()"
+    class="fixed top-0 right-0 z-50 h-screen w-full max-w-md bg-white border-l border-black flex flex-col"
+    role="dialog" aria-modal="true" aria-labelledby="cartDrawerTitle"
+  >
+    <!-- Header -->
+    <header class="flex items-center justify-between px-4 h-[60px] border-b border-black">
+      <h2 id="cartDrawerTitle" class="text-lg font-medium">
+        {{ 'sections.cart.title' | t }} (<span x-text="cart.item_count">0</span>)
+      </h2>
+      <button @click="close()" class="p-2 hover:bg-gray-100" aria-label="Close cart">✕</button>
+    </header>
+
+    <!-- Items -->
+    <div class="flex-1 overflow-y-auto">
+      <template x-if="cart.item_count === 0">
+        <div class="p-6 text-center text-sm text-gray-500">
+          {{ 'sections.cart.empty' | t }}
+        </div>
+      </template>
+
+      <template x-for="item in cart.items" :key="item.key">
+        <!-- Row: square image column + right divider -->
+        <div class="grid grid-cols-[120px_1fr_auto] items-start border-b border-black">
+          <!-- Image column (square) -->
+          <a
+            :href="item.url"
+            class="w-[120px] aspect-square border-r border-black flex items-center justify-center"
+          >
+            <img
+              :src="image(item, 360)"
+              :alt="item.title"
+              width="360"
+              height="360"
+              class="max-w-full max-h-full object-contain"
+              loading="lazy"
+            >
+          </a>
+
+          <!-- Middle: title, options, qty -->
+          <div class="min-w-0 py-4 px-4">
+            <a :href="item.url" class="block font-medium truncate hover:underline"
+               x-text="item.product_title"></a>
+
+            <!-- Variant/options -->
+            <template x-if="item.options_with_values && item.options_with_values.length">
+              <div class="mt-1 space-y-0.5 text-sm">
+                <template x-for="opt in item.options_with_values" :key="opt.name">
+                  <div class="flex items-center gap-2">
+                    <template x-if="String(opt.name).toLowerCase().includes('color') || String(opt.name).toLowerCase().includes('colour')">
+                      <span
+                        class="inline-block w-4 h-4 rounded-sm border border-black"
+                        :style="`background: ${opt.value};`"
+                        aria-hidden="true"
+                      ></span>
+                    </template>
+                    <span class="text-gray-600 truncate" x-text="opt.value"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Qty controls -->
+            <div class="mt-3 flex items-center gap-4 text-black">
+              <button
+                type="button"
+                class="p-0 leading-none disabled:opacity-50"
+                @click="update(item, Math.max(0, (item.quantity - 1)))"
+                :aria-label="'{{ 'sections.cart.aria_dec' | t }}'"
+                :disabled="item.quantity <= 0"
+              >−</button>
+
+              <input
+                type="number"
+                min="0"
+                class="w-12 text-center"
+                :value="item.quantity"
+                @change="update(item, Number($event.target.value || 0))"
+              >
+
+              <button
+                type="button"
+                class="p-0 leading-none"
+                @click="update(item, item.quantity + 1)"
+                :aria-label="'{{ 'sections.cart.aria_inc' | t }}'"
+              >+</button>
+            </div>
+          </div>
+
+          <!-- Right: price at top, trash at bottom -->
+          <div class="py-4 px-4 h-full flex flex-col justify-between items-end">
+            <!-- Price -->
+            <div class="text-right leading-tight">
+              <div class="font-medium" x-text="money(item.final_price)"></div>
+              <div
+                class="text-xs text-gray-500 line-through"
+                x-show="item.original_price > item.final_price"
+                x-text="money(item.original_price)"
+              ></div>
+            </div>
+
+            <!-- Trash (pinned bottom-right) -->
+            <button
+              type="button"
+              class="mt-4 p-1 text-black hover:text-black"
+              @click="remove(item)"
+              :aria-label="'{{ 'sections.cart.aria_remove' | t }}'"
+              title="{{ 'sections.cart.remove' | t }}"
+            >
+              {% render 'icon', name: 'trash', class: 'w-4 h-4' %}
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-black p-4">
+      <div class="flex items-center justify-between mb-4">
+        <span class="font-bold">{{ 'sections.cart.total' | t }}</span>
+        <span class="font-bold" x-text="money(cart.total_price)"></span>
+      </div>
+      <div class="flex gap-3">
+        <a href="{{ routes.all_products_collection_url }}" class="flex-1 px-4 py-3 border border-black text-center hover:bg-gray-100">
+          {{ 'sections.cart.continue_shopping' | t }}
+        </a>
+        <form action="{{ routes.cart_url }}" method="post" class="flex-1">
+          <button type="submit" name="checkout" class="w-full px-4 py-3 bg-black text-white hover:bg-black/80">
+            {{ 'sections.cart.checkout' | t }}
+          </button>
+        </form>
+      </div>
+    </footer>
+  </aside>
+</div>
