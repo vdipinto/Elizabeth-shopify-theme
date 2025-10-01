@@ -11,6 +11,8 @@
     {% render 'icon-menu', class: cls, title: label %}
   {%- when 'arrow-up-right' -%}
     {% render 'icon-arrow-up-right', class: cls, title: label %}
+  {%- when 'trash' -%}
+    {% render 'icon-trash', class: cls, title: label %}
   {%- else -%}
     <!-- unknown icon: '{{ name }}' -->
 {%- endcase -%}
