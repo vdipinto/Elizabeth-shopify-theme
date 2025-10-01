@@ -25,20 +25,31 @@
 
     <!-- Tailwind output -->
     {{ 'application.css' | asset_url | stylesheet_tag }}
+    
 
     <!-- Custom font overrides -->
     {{ 'fonts.css' | asset_url | stylesheet_tag }}  
 
     <!-- Alpine.js (local copy, served by Shopify CDN) -->
     <script src="{{ 'alpine.min.js' | asset_url }}" defer></script>
+    <!-- Alpine focus -->
+    <script src="https://unpkg.com/@alpinejs/focus@3.13.7/dist/cdn.min.js" defer></script>
+    <!-- Cart drawer component -->
+    {{ 'cart-drawer.js' | asset_url | script_tag }}    
 
-    <!-- Your theme JS -->
+    {{ 'cart.js' | asset_url | script_tag }} 
+
+    <!-- theme JS -->
     <script src="{{ 'application.js' | asset_url }}" defer></script>
+
+   
   </head>
   <body>
     {% section 'header' %}
     <main role="main">
       {{ content_for_layout }}
     </main>
+     <!-- Cart drawer component -->
+    {% section 'cart-drawer' %}
   </body>
 </html>
