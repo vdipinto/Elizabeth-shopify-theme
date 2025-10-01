@@ -1,0 +1,38 @@
+{
+    "sections": {
+      "cart": {
+        "type": "template-cart",
+        "settings": {},
+        "blocks": {
+          "cs-1": {
+            "type": "continue_shopping",
+            "settings": {
+              "label": "Continue Shopping",
+              "url": ""
+            }
+          },
+          "sub-1": {
+            "type": "subtotal",
+            "settings": {
+              "label": "Subtotal"
+            }
+          },
+          "upd-1": {
+            "type": "update_button",
+            "settings": {
+              "label": "Update Cart"
+            }
+          },
+          "chk-1": {
+            "type": "checkout_button",
+            "settings": {
+              "label": "Checkout"
+            }
+          }
+        },
+        "block_order": ["cs-1", "sub-1", "upd-1", "chk-1"]
+      }
+    },
+    "order": ["cart"]
+  }
+  
